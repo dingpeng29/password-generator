@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="免费在线随机密码生成器，支持自定义长度、字符类型，含密码强度检测。纯浏览器本地生成，不上传数据。">
+<meta name="keywords" content="密码生成器,随机密码,强密码生成,在线密码生成,password generator,密码强度">
+<meta property="og:title" content="随机密码在线生成器 - Password Generator | ToolBox Pro">
+<meta property="og:description" content="生成高强度随机密码，支持自定义长度和字符类型，含密码强度检测。">
+<meta property="og:url" content="https://dingpeng29.github.io/password-generator/">
+<title>随机密码在线生成器 - Password Generator | ToolBox Pro</title>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"密码生成器","url":"https://dingpeng29.github.io/password-generator/","description":"在线生成高强度随机密码","applicationCategory":"Utility","operatingSystem":"All","inLanguage":"zh-CN"}
+</script>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--text2:#64748b;--border:#e2e8f0;--primary:#3b82f6;--primary-h:#2563eb;--green:#10b981;--red:#ef4444;--amber:#f59e0b;--shadow:0 1px 3px rgba(0,0,0,0.06);--radius:12px;--radius-sm:8px;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;}
+.header{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;}
+.header .logo{font-size:20px;font-weight:700;text-decoration:none;color:var(--text);}
+.header .back{color:var(--text2);text-decoration:none;font-size:14px;}.header .back:hover{color:var(--primary);}
+.container{max-width:800px;margin:0 auto;padding:24px 20px;}
+.hero{text-align:center;padding:32px 20px 24px;}
+.hero h1{font-size:28px;font-weight:800;}
+.hero p{color:var(--text2);font-size:14px;margin-top:8px;}
+.card{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:20px;}
+.card h2{font-size:16px;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+
+.pwd-display{display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border-radius:var(--radius-sm);margin-bottom:20px;border:2px solid var(--border);transition:border-color .3s;}
+.pwd-display.strong{border-color:var(--green);}
+.pwd-display.medium{border-color:var(--amber);}
+.pwd-display.weak{border-color:var(--red);}
+.pwd-display .pwd-text{flex:1;font-size:22px;font-family:'SF Mono','Consolas',monospace;word-break:break-all;letter-spacing:1px;}
+.pwd-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.pwd-item{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);font-family:'SF Mono','Consolas',monospace;font-size:14px;}
+.pwd-item .txt{flex:1;word-break:break-all;}
+
+.strength-bar{display:flex;gap:4px;height:6px;border-radius:3px;margin-top:8px;overflow:hidden;}
+.strength-bar .seg{flex:1;background:#e2e8f0;transition:background .3s;}
+.strength-bar .seg.l1{background:var(--red);}
+.strength-bar .seg.l2{background:var(--amber);}
+.strength-bar .seg.l3{background:var(--green);}
+
+.options{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:500px){.options{grid-template-columns:1fr;}}
+.opt-label{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;}
+.opt-label input[type=checkbox]{width:18px;height:18px;accent-color:var(--primary);}
+.range-group{display:flex;align-items:center;gap:12px;}
+.range-group input[type=range]{flex:1;accent-color:var(--primary);}
+.range-group .range-val{font-size:20px;font-weight:800;min-width:36px;text-align:center;color:var(--primary);}
+
+.btn{padding:10px 20px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn-primary{background:var(--primary);color:#fff;}.btn-primary:hover{background:var(--primary-h);}
+.btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#059669;}
+.btn-secondary{background:var(--bg);color:var(--text);border:1px solid var(--border);}.btn-secondary:hover{background:var(--border);}
+.btn-lg{padding:14px 32px;font-size:16px;}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:16px;}
+
+.donate-box{background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:var(--radius);padding:20px 24px;text-align:center;border:1px solid #fcd34d;margin-bottom:16px;}
+.donate-box h3{color:#92400e;font-size:16px;margin-bottom:4px;}
+.donate-box p{color:#a16207;font-size:13px;margin-bottom:8px;}
+
+.footer{text-align:center;padding:32px 20px;color:var(--text2);font-size:12px;border-top:1px solid var(--border);margin-top:32px;}.footer a{color:var(--primary);text-decoration:none;}
+.powered{text-align:center;font-size:13px;color:var(--text2);margin-top:24px;}.powered a{color:var(--primary);text-decoration:none;font-weight:600;}
+.copy-toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 24px;border-radius:20px;font-size:14px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;}
+.copy-toast.show{opacity:1;}
+</style>
+</head>
+<body>
+<header class="header"><a href="/password-generator/" class="logo">🔐 密码生成器</a><a href="/" class="back">← ToolBox Pro</a></header>
+<div class="container">
+<div class="hero"><h1>随机密码在线生成器</h1><p>生成高强度随机密码，自定义长度和字符类型，含强度检测。所有生成在浏览器本地完成。</p></div>
+
+<div class="donate-box">
+<h3>❤️ 支持这个工具</h3>
+<p>完全免费、无广告。如果帮到了你，欢迎支持 ☕</p>
+<div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;margin-top:12px;">
+<div style="text-align:center;background:#fff;padding:16px 20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+<img src="donate-qr.jpg" alt="微信赞赏码" style="width:200px;height:200px;border-radius:8px;">
+<span style="font-size:13px;color:#92400e;font-weight:700;margin-top:8px;display:block;">微信扫码赞赏</span>
+</div>
+<div style="text-align:center;background:#fff;padding:16px 20px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+<span style="font-size:48px;display:block;margin-bottom:8px;">💝</span>
+<span style="font-size:13px;color:#92400e;font-weight:700;display:block;">爱发电按月赞助</span>
+<span style="font-size:11px;color:#94a3b8;display:block;">每月支持 · 持续创作</span>
+<a href="https://afdian.com/a/toolboxpro" target="_blank" style="display:inline-block;margin-top:8px;background:#f59e0b;color:#fff;padding:8px 20px;border-radius:20px;text-decoration:none;font-size:13px;font-weight:700;">去爱发电 →</a>
+</div>
+</div>
+<div style="margin-top:12px;">
+<a href="https://github.com/dingpeng29/password-generator" target="_blank" style="color:#92400e;font-weight:600;text-decoration:none;font-size:13px;">⭐ 也欢迎给个 GitHub Star</a>
+</div>
+</div>
+
+<div class="card">
+<h2>🔑 生成密码</h2>
+<div class="pwd-display" id="pwdDisplay">
+<div class="pwd-text" id="pwdText">点击"生成密码"按钮</div>
+<button class="btn btn-green" onclick="copyPwd()" id="btnCopy" disabled>📋 复制</button>
+</div>
+<div class="strength-bar" id="strengthBar"><div class="seg"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div></div>
+<div style="text-align:center;font-size:12px;color:var(--text2);margin-top:4px;" id="strengthLabel">强度：--</div>
+
+<div style="margin-top:20px;">
+<div style="font-size:14px;font-weight:600;margin-bottom:8px;">密码长度: <span id="lenLabel" style="color:var(--primary);">16</span></div>
+<div class="range-group">
+<span style="font-size:13px;color:var(--text2);">4</span>
+<input type="range" id="pwdLen" min="4" max="64" value="16" oninput="updateLen()">
+<span style="font-size:13px;color:var(--text2);">64</span>
+</div>
+</div>
+
+<div style="margin-top:20px;">
+<div style="font-size:14px;font-weight:600;margin-bottom:12px;">字符类型</div>
+<div class="options">
+<label class="opt-label"><input type="checkbox" id="chkUpper" checked onchange="gen()"> 大写字母 A-Z</label>
+<label class="opt-label"><input type="checkbox" id="chkLower" checked onchange="gen()"> 小写字母 a-z</label>
+<label class="opt-label"><input type="checkbox" id="chkNum" checked onchange="gen()"> 数字 0-9</label>
+<label class="opt-label"><input type="checkbox" id="chkSym" onchange="gen()"> 符号 !@#$%^&*</label>
+</div>
+</div>
+
+<div class="btn-row">
+<button class="btn btn-primary btn-lg" onclick="gen()">🎲 生成密码</button>
+<button class="btn btn-secondary" onclick="genMultiple()">📋 生成10个</button>
+</div>
+
+<div class="pwd-list" id="pwdList" style="display:none;">
+<h3 style="font-size:14px;margin-top:8px;">批量生成的密码</h3>
+</div>
+</div>
+
+<div class="card">
+<h2>💡 安全密码建议</h2>
+<ul style="font-size:14px;color:var(--text2);padding-left:20px;line-height:2;">
+<li>使用至少 <strong>12位</strong> 以上的密码</li>
+<li>包含大小写字母、数字和特殊符号</li>
+<li>避免使用个人信息（生日、姓名等）</li>
+<li>不同网站使用不同的密码</li>
+<li>建议使用密码管理器（如 Bitwarden）</li>
+<li>定期更换重要账户的密码</li>
+</ul>
+</div>
+
+<div class="powered">由 <a href="/">ToolBox Pro</a> 提供支持 · <a href="https://github.com/dingpeng29/password-generator" target="_blank">GitHub</a></div>
+</div>
+<footer class="footer"><p>Password Generator — 所有生成在浏览器本地完成 · <a href="https://github.com/dingpeng29/password-generator" target="_blank">GitHub</a> · <a href="/">更多免费工具 →</a></p></footer>
+<div class="copy-toast" id="toast"></div>
+
+<script>
+var upperChars='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+var lowerChars='abcdefghijklmnopqrstuvwxyz';
+var numChars='0123456789';
+var symChars='!@#$%^&*()_+-=[]{}|;:,.<>?';
+
+function updateLen(){
+document.getElementById('lenLabel').textContent=document.getElementById('pwdLen').value;
+gen();
+}
+
+function gen(){
+var len=parseInt(document.getElementById('pwdLen').value);
+var useUpper=document.getElementById('chkUpper').checked;
+var useLower=document.getElementById('chkLower').checked;
+var useNum=document.getElementById('chkNum').checked;
+var useSym=document.getElementById('chkSym').checked;
+
+var pool='';
+if(useUpper) pool+=upperChars;
+if(useLower) pool+=lowerChars;
+if(useNum) pool+=numChars;
+if(useSym) pool+=symChars;
+
+var display=document.getElementById('pwdDisplay');
+var textEl=document.getElementById('pwdText');
+var copyBtn=document.getElementById('btnCopy');
+
+if(!pool){
+textEl.textContent='请至少选择一种字符类型';
+display.className='pwd-display';
+copyBtn.disabled=true;
+updateStrength('');
+return;
+}
+
+var arr=new Uint32Array(len);
+crypto.getRandomValues(arr);
+var pwd='';
+for(var i=0;i<len;i++) pwd+=pool[arr[i]%pool.length];
+
+textEl.textContent=pwd;
+updateStrength(pwd);
+copyBtn.disabled=false;
+}
+
+function updateStrength(pwd){
+var bar=document.getElementById('strengthBar');
+var label=document.getElementById('strengthLabel');
+var display=document.getElementById('pwdDisplay');
+var segs=bar.querySelectorAll('.seg');
+segs.forEach(function(s){s.className='seg';});
+
+if(!pwd){
+display.className='pwd-display';
+label.textContent='强度：--';
+return;
+}
+
+var score=0;
+var len=pwd.length;
+if(len>=8)score++;if(len>=12)score++;if(len>=16)score++;if(len>=24)score++;
+if(/[A-Z]/.test(pwd))score++;
+if(/[a-z]/.test(pwd))score++;
+if(/[0-9]/.test(pwd))score++;
+if(/[^A-Za-z0-9]/.test(pwd))score+=2;
+if(/[A-Z].*[a-z]|[a-z].*[A-Z]/.test(pwd))score++;
+if(/[0-9].*[^0-9A-Za-z]|[^0-9A-Za-z].*[0-9]/.test(pwd))score++;
+
+var level,cls;
+if(score<5){level='弱';cls='weak';segs[0].className='seg l1';}
+else if(score<8){level='中等';cls='medium';segs[0].className='seg l2';segs[1].className='seg l2';}
+else if(score<10){level='强';cls='strong';segs[0].className='seg l3';segs[1].className='seg l3';segs[2].className='seg l3';}
+else {level='非常强';cls='strong';segs.forEach(function(s){s.className='seg l3';});}
+
+display.className='pwd-display '+cls;
+label.textContent='强度：'+level;
+}
+
+function copyPwd(){
+var text=document.getElementById('pwdText').textContent;
+navigator.clipboard.writeText(text);
+toast('已复制');
+}
+
+function genMultiple(){
+var list=document.getElementById('pwdList');
+var html='';
+for(var i=0;i<10;i++){
+gen();
+var pwd=document.getElementById('pwdText').textContent;
+html+='<div class="pwd-item"><span class="txt">'+escHtml(pwd)+'</span><button class="btn btn-sm btn-secondary" onclick="copyItem(this,\''+escHtml(pwd)+'\')">复制</button></div>';
+}
+list.innerHTML='<h3 style="font-size:14px;margin-bottom:8px;margin-top:8px;">批量生成的密码</h3>'+html;
+list.style.display='block';
+}
+
+function copyItem(btn,text){
+navigator.clipboard.writeText(text);
+btn.textContent='已复制';
+setTimeout(function(){btn.textContent='复制';},1500);
+}
+
+function toast(msg){
+var t=document.getElementById('toast');
+t.textContent=msg;t.classList.add('show');
+clearTimeout(t._tid);
+t._tid=setTimeout(function(){t.classList.remove('show');},1800);
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Generate on load
+gen();
+</script>
+
+<script>
+(function(){
+var bp = document.createElement('script');
+var curProtocol = window.location.protocol.split(':')[0];
+if (curProtocol === 'https') { bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'; }
+else { bp.src = 'http://push.zhanzhang.baidu.com/push.js'; }
+var s = document.getElementsByTagName("script")[0];
+s.parentNode.insertBefore(bp, s);
+})();
+</script>
+</body>
+</html>
